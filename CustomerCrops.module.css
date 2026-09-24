@@ -1,0 +1,253 @@
+.container {
+    width: min(1240px, 100%);
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 40px 32px 60px;
+    background:
+        linear-gradient(120deg, rgba(16, 28, 13, .97), rgba(35, 58, 24, .94)),
+        repeating-linear-gradient(78deg, rgba(181, 177, 83, .12) 0 2px, transparent 2px 20px);
+    color: #fff;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    width: min(1200px, 100%);
+    margin: 0 auto 32px;
+    padding: 1.6rem 1.8rem;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: rgba(16, 29, 13, .86);
+    border-color: rgba(218, 233, 169, .25);
+    box-shadow: 12px 12px 0 rgba(9, 18, 7, .2);
+    animation: riseIn .5s ease both;
+}
+
+.header h1 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2rem, 1.7rem + 1vw, 3rem);
+    line-height: 1.1;
+}
+
+.header p {
+    margin-top: 0.5rem;
+    color: rgba(255, 255, 255, .65);
+    font-size: 0.97rem;
+}
+
+.headerButtons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ordersButton,
+.viewCartButton {
+    padding: 0.85rem 1.25rem;
+    border: none;
+    border-radius: 2px;
+    color: #17230e;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ordersButton {
+    background: #a8c85d;
+    box-shadow: none;
+}
+
+.ordersButton:hover,
+.viewCartButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 0 rgba(168, 200, 93, .2);
+}
+
+.viewCartButton {
+    background: #c7922e;
+    color: #fff;
+}
+
+.cropGrid {
+    width: min(1200px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    box-sizing: border-box;
+}
+
+.cropCard {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.6rem;
+    background: rgba(250, 247, 236, .97);
+    border: 1px solid rgba(218, 233, 169, .2);
+    border-radius: 3px;
+    box-shadow: 10px 10px 0 rgba(9, 18, 7, .18);
+    animation: riseIn .55s ease both;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cropCard:hover {
+    transform: translateY(-7px) rotate(-.5deg);
+    box-shadow: 14px 16px 0 rgba(9, 18, 7, .22);
+}
+
+.cropIcon {
+    text-align: center;
+    margin-bottom: 0.8rem;
+    font-size: 3rem;
+}
+
+.cropCard h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--deep-forest);
+    font-size: 1.4rem;
+}
+
+.details {
+    margin-bottom: 1.3rem;
+}
+
+.details p {
+    margin: 0.55rem 0;
+    color: #657265;
+    line-height: 1.6;
+}
+
+.farmerBox {
+    padding: 1rem 1.1rem;
+    background: #e5ead9;
+    border: 1px solid rgba(49, 91, 55, .14);
+    border-radius: 2px;
+    margin-bottom: 1.25rem;
+}
+
+.farmerBox h3 {
+    margin-top: 0;
+    color: var(--deep-forest);
+}
+
+.farmerBox p {
+    margin: 0.45rem 0;
+    color: #657265;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.cartButton,
+.buyButton {
+    flex: 1;
+    padding: 0.8rem 0.75rem;
+    border: none;
+    border-radius: 2px;
+    color: var(--white);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.cartButton {
+    background: var(--deep-forest);
+}
+
+.buyButton {
+    background: var(--saffron);
+}
+
+.cartButton:hover,
+.buyButton:hover {
+    transform: translateY(-1px);
+}
+
+.noCrops {
+    width: min(760px, 100%);
+    min-height: 300px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: rgba(16, 29, 13, .86);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: var(--shadow-soft);
+    padding: 2rem;
+}
+
+.noCrops h2 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.noCrops p {
+    color: rgba(255,255,255,.65);
+    line-height: 1.7;
+}
+
+.loading,
+.error {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #101b0e;
+    color: #d6e39e;
+    text-align: center;
+    padding: 2rem;
+}
+
+.error button {
+    margin-top: 1rem;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 999px;
+    background: #a8c85d;
+    color: var(--white);
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 16px 40px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .headerButtons {
+        width: 100%;
+    }
+
+    .ordersButton,
+    .viewCartButton {
+        flex: 1;
+    }
+
+    .cropGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+}
