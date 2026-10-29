@@ -196,3 +196,71 @@
         align-items: flex-start;
     }
 }
+
+.page,
+.empty {
+    background:
+        radial-gradient(ellipse at 12% 5%, rgba(117,208,67,.11), transparent 30rem),
+        #08120c;
+}
+.container { width: min(1120px, calc(100% - 40px)); }
+.header,
+.card {
+    border: 1px solid rgba(235,255,230,.13);
+    border-radius: 21px;
+    background: rgba(255,255,255,.06);
+    box-shadow: 0 20px 54px rgba(0,0,0,.2);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+.header { box-shadow: none; }
+.header h1,
+.card h2,
+.cropInfo h3,
+.empty h2 { color: #f2f8ee; }
+.backButton {
+    border-color: rgba(255,255,255,.16);
+    border-radius: 10px;
+    background: rgba(255,255,255,.05);
+    color: #d9f4ca;
+}
+.cropInfo {
+    border: 1px solid rgba(235,255,230,.1);
+    border-radius: 14px;
+    background: rgba(255,255,255,.045);
+}
+.cropInfo p,
+.total span { color: rgba(230,240,226,.66); }
+.inputGroup label { color: rgba(239,247,235,.8); }
+.inputGroup input,
+.inputGroup textarea,
+.inputGroup select {
+    border-color: rgba(235,255,230,.15);
+    border-radius: 11px;
+    background: rgba(3,11,7,.38);
+    color: #f5faf3;
+}
+.inputGroup input:focus,
+.inputGroup textarea:focus,
+.inputGroup select:focus {
+    outline: none;
+    border-color: rgba(199,255,94,.65);
+    box-shadow: 0 0 0 3px rgba(199,255,94,.1);
+}
+.total { border-color: rgba(255,255,255,.12); }
+.total strong { color: #c7ff5e; }
+.message { border-radius: 12px; }
+.placeOrderButton,
+.empty button {
+    min-height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #d5ff80, #a4e94f);
+    color: #14210e;
+    box-shadow: 0 12px 28px rgba(148,215,73,.16);
+}
+.empty { color: #f5faf3; }
+
+@media (max-width: 520px) {
+    .container { width: calc(100% - 28px); }
+    .card { padding: 1.2rem; border-radius: 18px; }
+}

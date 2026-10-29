@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./FarmerOrders.module.css";
+import formatCurrency from "./formatCurrency";
 import Popup from "./Popup";
 
 const FarmerOrders = () => {
@@ -420,7 +421,7 @@ const FarmerOrders = () => {
                                             </span>
 
                                             <strong>
-                                                ₹{order.price} /{" "}
+                                                {formatCurrency(order.price)} /{" "}
                                                 {order.unit}
                                             </strong>
 
@@ -433,7 +434,7 @@ const FarmerOrders = () => {
                                             </span>
 
                                             <strong>
-                                                ₹{order.totalAmount}
+                                                {formatCurrency(order.totalAmount)}
                                             </strong>
 
                                         </div>

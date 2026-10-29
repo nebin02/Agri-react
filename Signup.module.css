@@ -803,3 +803,62 @@
         font-size: 0.78rem;
     }
 }
+
+.page {
+    isolation: isolate;
+    background:
+        radial-gradient(ellipse at 18% 16%, rgba(121,211,69,.17), transparent 26rem),
+        radial-gradient(ellipse at 86% 82%, rgba(70,144,77,.13), transparent 28rem),
+        linear-gradient(145deg, #0b1710, #060d09);
+}
+
+.card {
+    width: min(100%, 540px);
+    padding: clamp(26px, 5vw, 44px);
+    border: 1px solid rgba(234,255,229,.16);
+    border-radius: 26px;
+    background: linear-gradient(145deg, rgba(24,43,29,.78), rgba(9,19,13,.77));
+    box-shadow: 0 28px 80px rgba(0,0,0,.4), inset 0 1px rgba(255,255,255,.08);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    animation: none;
+}
+
+.card::before { opacity: .42; }
+.header h1 { color: #f7fbf4; text-shadow: none; }
+.header p { color: rgba(229,240,225,.7); }
+.userType { gap: 10px; }
+.typeButton,
+.activeType { border-radius: 12px; }
+.typeButton { border-color: rgba(255,255,255,.17); background: rgba(255,255,255,.035); }
+.activeType { color: #111a0d; background: #c7ff5e; border-color: #c7ff5e; }
+.card h2 { color: #c7ff5e; }
+.inputGroup label { color: rgba(239,247,235,.8); letter-spacing: .04em; }
+.inputGroup input {
+    border-radius: 12px;
+    border-color: rgba(235,255,230,.15);
+    background: rgba(3,11,7,.38);
+}
+.inputGroup input:focus {
+    border-color: rgba(199,255,94,.65);
+    box-shadow: 0 0 0 3px rgba(199,255,94,.1);
+}
+.signupButton {
+    min-height: 48px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #d5ff80, #a4e94f);
+    color: #14210e;
+    box-shadow: 0 12px 30px rgba(148,215,73,.18);
+}
+.signupButton:hover { background: #e0ff9a; transform: translateY(-2px); }
+.message { border-radius: 12px; }
+.homeLink,
+.loginText a { color: #c7ff5e; }
+.passwordToggle,
+.resendButton { color: #c7ff5e; }
+.backButton { color: rgba(240,247,236,.78); border-color: rgba(255,255,255,.16); }
+
+@media (max-width: 520px) {
+    .page { padding: 18px 14px; }
+    .card { border-radius: 21px; }
+}

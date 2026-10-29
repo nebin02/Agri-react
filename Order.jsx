@@ -2,273 +2,658 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./Order.module.css";
+import formatCurrency from "./formatCurrency";
 
 const Order = () => {
 
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
-const [orders, setOrders] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState("");
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-const customerId = localStorage.getItem("userId");
+    // ==========================================
+    // REVIEW STATES
+    // ==========================================
 
+    const [reviewOrder, setReviewOrder] = useState(null);
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState("");
+    const [reviewLoading, setReviewLoading] = useState(false);
+    const [reviewMessage, setReviewMessage] = useState("");
+    const [reviewError, setReviewError] = useState("");
 
-// ==========================================
-// GET CUSTOMER ORDERS
-// ==========================================
+    const customerId = localStorage.getItem("userId");
 
-const getOrders = async () => {
 
-try {
+    // ==========================================
+    // GET CUSTOMER ORDERS
+    // ==========================================
 
-if (!customerId) {
-setError("Please login first.");
-setLoading(false);
-return;
-}
+    const getOrders = async () => {
 
-const response = await axios.get(
-`http://localhost:3000/orders/customer/${customerId}`
-);
+        try {
 
-console.log("Orders:", response.data);
+            if (!customerId) {
+                setError("Please login first.");
+                setLoading(false);
+                return;
+            }
 
-setOrders(response.data.orders || []);
+            const response = await axios.get(
+                `http://localhost:3000/orders/customer/${customerId}`
+            );
 
-setLoading(false);
+            console.log("Orders:", response.data);
 
-} catch (error) {
+            setOrders(response.data.orders || []);
 
-console.log("Get orders error:", error);
+            setLoading(false);
 
-setError(
-error.response?.data?.message ||
-"Unable to load orders."
-);
+        } catch (error) {
 
-setLoading(false);
-}
-};
+            console.log("Get orders error:", error);
 
+            setError(
+                error.response?.data?.message ||
+                "Unable to load orders."
+            );
 
-useEffect(() => {
+            setLoading(false);
+        }
+    };
 
-getOrders();
 
-}, []);
+    useEffect(() => {
 
+        getOrders();
 
-// ==========================================
-// LOADING
-// ==========================================
+    }, []);
 
-if (loading) {
 
-return (
-<div className={styles.loading}>
-<h2>Loading your orders... 📦</h2>
-</div>
-);
-}
+    // ==========================================
+    // OPEN REVIEW FORM
+    // ==========================================
 
+    const openReview = (order) => {
 
-// ==========================================
-// ERROR
-// ==========================================
+        setReviewOrder(order);
 
-if (error) {
+        setRating(0);
+        setComment("");
 
-return (
-<div className={styles.error}>
+        setReviewMessage("");
+        setReviewError("");
+    };
 
-<h2>{error}</h2>
 
-<button onClick={() => navigate("/customer-crops")}>
-Go Back
-</button>
+    // ==========================================
+    // CLOSE REVIEW FORM
+    // ==========================================
 
-</div>
-);
-}
+    const closeReview = () => {
 
+        setReviewOrder(null);
 
-// ==========================================
-// PAGE
-// ==========================================
+        setRating(0);
+        setComment("");
 
-return (
+        setReviewMessage("");
+        setReviewError("");
+    };
 
-<div className={styles.container}>
 
-<div className={styles.header}>
+    // ==========================================
+    // SUBMIT REVIEW
+    // ==========================================
 
-<div>
-<h1>My Orders 📦</h1>
+    const submitReview = async () => {
 
-<p>
-View all your crop orders and their status.
-</p>
-</div>
+        if (!rating) {
 
-<button
-className={styles.backButton}
-onClick={() => navigate("/customer-crops")}
->
-← Continue Shopping
-</button>
+            setReviewError(
+                "Please select a rating."
+            );
 
-</div>
+            return;
+        }
 
+        if (!comment.trim()) {
 
-{/* ==========================================
-NO ORDERS
-========================================== */}
+            setReviewError(
+                "Please write a comment."
+            );
 
-{orders.length === 0 ? (
+            return;
+        }
 
-<div className={styles.noOrders}>
+        try {
 
-<div className={styles.emptyIcon}>
-📦
-</div>
+            setReviewLoading(true);
+            setReviewError("");
+            setReviewMessage("");
 
-<h2>No Orders Yet</h2>
+            const response = await axios.post(
+                "http://localhost:3000/review/add",
+                {
+                    customerId: customerId,
+                    orderId: reviewOrder._id,
+                    rating: rating,
+                    comment: comment.trim()
+                }
+            );
 
-<p>
-You haven't placed any orders yet.
-</p>
+            console.log(
+                "Review response:",
+                response.data
+            );
 
-<button
-onClick={() => navigate("/customer-crops")}
->
-🌾 Browse Crops
-</button>
+            setReviewMessage(
+                "Review submitted successfully! ⭐"
+            );
 
-</div>
+            setReviewLoading(false);
 
-) : (
+            // Close review form after a short delay
+            setTimeout(() => {
 
-<div className={styles.orderGrid}>
+                closeReview();
 
-{orders.map((order) => (
+            }, 1500);
 
-<div
-className={styles.orderCard}
-key={order._id}
->
+        } catch (error) {
 
-{/* Order Header */}
+            console.log(
+                "Submit review error:",
+                error
+            );
 
-<div className={styles.orderHeader}>
+            setReviewError(
+                error.response?.data?.message ||
+                "Unable to submit review."
+            );
 
-<div>
-<h2>
-🌾 {order.cropName}
-</h2>
+            setReviewLoading(false);
+        }
+    };
 
-<small>
-Order ID: {order._id}
-</small>
-</div>
 
-<span
-className={`${styles.status} ${
-styles[
-order.orderStatus?.toLowerCase()
-]
-}`}
->
-{order.orderStatus}
-</span>
+    // ==========================================
+    // LOADING
+    // ==========================================
 
-</div>
+    if (loading) {
 
+        return (
+            <div className={styles.loading}>
 
-{/* Order Details */}
+                <h2>
+                    Loading your orders... 📦
+                </h2>
 
-<div className={styles.details}>
+            </div>
+        );
+    }
 
-<div className={styles.detailRow}>
-<span>📦 Quantity</span>
 
-<strong>
-{order.quantity} {order.unit}
-</strong>
-</div>
+    // ==========================================
+    // ERROR
+    // ==========================================
 
+    if (error) {
 
-<div className={styles.detailRow}>
-<span>💰 Price</span>
+        return (
+            <div className={styles.error}>
 
-<strong>
-₹{order.price} / {order.unit}
-</strong>
-</div>
+                <h2>
+                    {error}
+                </h2>
 
+                <button
+                    onClick={() =>
+                        navigate("/customer-crops")
+                    }
+                >
+                    Go Back
+                </button>
 
-<div className={styles.detailRow}>
-<span>💵 Total Amount</span>
+            </div>
+        );
+    }
 
-<strong>
-₹{order.totalAmount}
-</strong>
-</div>
 
+    // ==========================================
+    // PAGE
+    // ==========================================
 
-<div className={styles.detailRow}>
-<span>💳 Payment</span>
+    return (
 
-<strong>
-{order.paymentMethod}
-</strong>
-</div>
+        <div className={styles.container}>
 
+            {/* ==========================================
+                HEADER
+            ========================================== */}
 
-<div className={styles.detailRow}>
-<span>💳 Payment Status</span>
+            <div className={styles.header}>
 
-<strong>
-{order.paymentStatus}
-</strong>
-</div>
+                <div>
 
+                    <h1>
+                        My Orders 📦
+                    </h1>
 
-<div className={styles.address}>
+                    <p>
+                        View all your crop orders and their status.
+                    </p>
 
-<strong>
-📍 Delivery Address
-</strong>
+                </div>
 
-<p>
-{order.address}
-</p>
+                <button
+                    className={styles.backButton}
+                    onClick={() =>
+                        navigate("/customer-crops")
+                    }
+                >
+                    ← Continue Shopping
+                </button>
 
-</div>
+            </div>
 
 
-<div className={styles.date}>
+            {/* ==========================================
+                NO ORDERS
+            ========================================== */}
 
-Ordered on:{" "}
+            {orders.length === 0 ? (
 
-{new Date(
-order.createdAt
-).toLocaleString()}
+                <div className={styles.noOrders}>
 
-</div>
+                    <div className={styles.emptyIcon}>
+                        📦
+                    </div>
 
-</div>
+                    <h2>
+                        No Orders Yet
+                    </h2>
 
-</div>
+                    <p>
+                        You haven't placed any orders yet.
+                    </p>
 
-))}
+                    <button
+                        onClick={() =>
+                            navigate("/customer-crops")
+                        }
+                    >
+                        🌾 Browse Crops
+                    </button>
 
-</div>
+                </div>
 
-)}
+            ) : (
 
-</div>
-);
+                <div className={styles.orderGrid}>
+
+                    {orders.map((order) => (
+
+                        <div
+                            className={styles.orderCard}
+                            key={order._id}
+                        >
+
+                            {/* ==========================================
+                                ORDER HEADER
+                            ========================================== */}
+
+                            <div className={styles.orderHeader}>
+
+                                <div>
+
+                                    <h2>
+                                        🌾 {order.cropName}
+                                    </h2>
+
+                                    <small>
+                                        Order ID: {order._id}
+                                    </small>
+
+                                </div>
+
+                                <span
+                                    className={`${styles.status} ${
+                                        styles[
+                                            order.orderStatus?.toLowerCase()
+                                        ]
+                                    }`}
+                                >
+                                    {order.orderStatus}
+                                </span>
+
+                            </div>
+
+
+                            {/* ==========================================
+                                ORDER DETAILS
+                            ========================================== */}
+
+                            <div className={styles.details}>
+
+                                <div className={styles.detailRow}>
+
+                                    <span>
+                                        📦 Quantity
+                                    </span>
+
+                                    <strong>
+                                        {order.quantity} {order.unit}
+                                    </strong>
+
+                                </div>
+
+
+                                <div className={styles.detailRow}>
+
+                                    <span>
+                                        💰 Price
+                                    </span>
+
+                                    <strong>
+                                        {formatCurrency(order.price)} / {order.unit}
+                                    </strong>
+
+                                </div>
+
+
+                                <div className={styles.detailRow}>
+
+                                    <span>
+                                        💵 Total Amount
+                                    </span>
+
+                                    <strong>
+                                        {formatCurrency(order.totalAmount)}
+                                    </strong>
+
+                                </div>
+
+
+                                <div className={styles.detailRow}>
+
+                                    <span>
+                                        💳 Payment
+                                    </span>
+
+                                    <strong>
+                                        {order.paymentMethod}
+                                    </strong>
+
+                                </div>
+
+
+                                <div className={styles.detailRow}>
+
+                                    <span>
+                                        💳 Payment Status
+                                    </span>
+
+                                    <strong>
+                                        {order.paymentStatus}
+                                    </strong>
+
+                                </div>
+
+
+                                <div className={styles.address}>
+
+                                    <strong>
+                                        📍 Delivery Address
+                                    </strong>
+
+                                    <p>
+                                        {order.address}
+                                    </p>
+
+                                </div>
+
+
+                                <div className={styles.date}>
+
+                                    Ordered on:{" "}
+
+                                    {new Date(
+                                        order.createdAt
+                                    ).toLocaleString()}
+
+                                </div>
+
+
+                                {/* ==========================================
+                                    WRITE REVIEW BUTTON
+                                ========================================== */}
+
+                                {order.orderStatus === "Delivered" && (
+
+                                    <button
+                                        className={styles.reviewButton}
+                                        onClick={() =>
+                                            openReview(order)
+                                        }
+                                    >
+                                        ⭐ Write a Review
+                                    </button>
+
+                                )}
+
+                            </div>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+            )}
+
+
+            {/* ==========================================
+                REVIEW MODAL
+            ========================================== */}
+
+            {reviewOrder && (
+
+                <div className={styles.reviewOverlay}>
+
+                    <div className={styles.reviewModal}>
+
+                        {/* CLOSE BUTTON */}
+
+                        <button
+                            className={styles.closeReview}
+                            onClick={closeReview}
+                        >
+                            ×
+                        </button>
+
+
+                        {/* TITLE */}
+
+                        <div className={styles.reviewHeader}>
+
+                            <div className={styles.reviewIcon}>
+                                ⭐
+                            </div>
+
+                            <h2>
+                                Write a Review
+                            </h2>
+
+                            <p>
+                                How was your experience with{" "}
+                                <strong>
+                                    {reviewOrder.cropName}
+                                </strong>
+                                ?
+                            </p>
+
+                        </div>
+
+
+                        {/* ==========================================
+                            STAR RATING
+                        ========================================== */}
+
+                        <div className={styles.ratingSection}>
+
+                            <label>
+                                Your Rating
+                            </label>
+
+                            <div className={styles.stars}>
+
+                                {[1, 2, 3, 4, 5].map(
+                                    (star) => (
+
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            className={
+                                                star <= rating
+                                                    ? styles.starActive
+                                                    : styles.star
+                                            }
+                                            onClick={() =>
+                                                setRating(star)
+                                            }
+                                        >
+                                            ★
+                                        </button>
+
+                                    )
+                                )}
+
+                            </div>
+
+                            {rating > 0 && (
+
+                                <p className={styles.ratingText}>
+
+                                    {rating === 1 &&
+                                        "Very Poor 😞"}
+
+                                    {rating === 2 &&
+                                        "Poor 😕"}
+
+                                    {rating === 3 &&
+                                        "Average 😐"}
+
+                                    {rating === 4 &&
+                                        "Good 😊"}
+
+                                    {rating === 5 &&
+                                        "Excellent 🤩"}
+
+                                </p>
+
+                            )}
+
+                        </div>
+
+
+                        {/* ==========================================
+                            COMMENT
+                        ========================================== */}
+
+                        <div className={styles.commentSection}>
+
+                            <label>
+                                Your Review
+                            </label>
+
+                            <textarea
+                                value={comment}
+                                onChange={(e) =>
+                                    setComment(e.target.value)
+                                }
+                                placeholder="Tell us about the crop quality, freshness and your experience..."
+                                rows="5"
+                                maxLength="500"
+                            />
+
+                            <div className={styles.characterCount}>
+                                {comment.length}/500
+                            </div>
+
+                        </div>
+
+
+                        {/* ==========================================
+                            SUCCESS MESSAGE
+                        ========================================== */}
+
+                        {reviewMessage && (
+
+                            <div
+                                className={
+                                    styles.reviewSuccess
+                                }
+                            >
+                                {reviewMessage}
+                            </div>
+
+                        )}
+
+
+                        {/* ==========================================
+                            ERROR MESSAGE
+                        ========================================== */}
+
+                        {reviewError && (
+
+                            <div
+                                className={
+                                    styles.reviewError
+                                }
+                            >
+                                {reviewError}
+                            </div>
+
+                        )}
+
+
+                        {/* ==========================================
+                            BUTTONS
+                        ========================================== */}
+
+                        <div className={styles.reviewActions}>
+
+                            <button
+                                className={styles.cancelReview}
+                                onClick={closeReview}
+                                disabled={reviewLoading}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                className={styles.submitReview}
+                                onClick={submitReview}
+                                disabled={reviewLoading}
+                            >
+                                {reviewLoading
+                                    ? "Submitting..."
+                                    : "Submit Review ⭐"}
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
+        </div>
+    );
 };
 
 

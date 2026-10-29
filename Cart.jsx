@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Cart.module.css";
+import formatCurrency from "./formatCurrency";
 
 const Cart = () => {
 
@@ -119,7 +120,7 @@ const Cart = () => {
                                     <p>
                                         💰 Price:
                                         {" "}
-                                        ₹{crop.price} / {crop.unit}
+                                        {formatCurrency(crop.price)} / {crop.unit}
                                     </p>
 
                                     <p>
@@ -185,7 +186,7 @@ const Cart = () => {
                             </span>
 
                             <strong>
-                                ₹{total}
+                                {formatCurrency(total)}
                             </strong>
 
                         </div>

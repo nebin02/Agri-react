@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./Checkout.module.css";
 import Popup from "./Popup";
+import FirstOrderOffer from "./FirstOrderOffer";
+import formatCurrency from "./formatCurrency";
 
 const Checkout = () => {
 
@@ -482,6 +484,8 @@ const Checkout = () => {
 
                 </div>
 
+                <FirstOrderOffer />
+
                 <div className={styles.checkoutGrid}>
 
                     {/* =================================================
@@ -501,7 +505,7 @@ const Checkout = () => {
                             </h3>
 
                             <p>
-                                Price: ₹{crop.price} / {crop.unit}
+                                Price: {formatCurrency(crop.price)} / {crop.unit}
                             </p>
 
                             <p>
@@ -538,11 +542,11 @@ const Checkout = () => {
                         <div className={styles.total}>
 
                             <span>
-                                Total Amount
+                                Crop subtotal (before any offer)
                             </span>
 
                             <strong>
-                                ₹{totalAmount}
+                                {formatCurrency(totalAmount)}
                             </strong>
 
                         </div>

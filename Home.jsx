@@ -1,535 +1,249 @@
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Home.module.css";
 
 const Home = () => {
+    const [pointer, setPointer] = useState({ x: 0, y: 0 });
+    const frameRef = useRef(null);
+
+    useEffect(() => {
+        return () => {
+            if (frameRef.current) {
+                cancelAnimationFrame(frameRef.current);
+            }
+        };
+    }, []);
+
+    const handleMouseMove = (event) => {
+        if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+            return;
+        }
+
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+        const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+
+        if (frameRef.current) {
+            cancelAnimationFrame(frameRef.current);
+        }
+
+        frameRef.current = requestAnimationFrame(() => {
+            setPointer({ x, y });
+        });
+    };
+
+    const heroStyle = {
+        "--mouse-x": pointer.x.toFixed(3),
+        "--mouse-y": pointer.y.toFixed(3),
+    };
+
     return (
         <div className={styles.page}>
-
-            {/* ================= NAVBAR ================= */}
-
             <nav className={styles.navbar}>
-
                 <div className={styles.logo}>
                     <span>🌱</span> AgriNext
                 </div>
 
                 <div className={styles.navLinks}>
+                    <a href="#home" className={styles.navLink}>Home</a>
+                    <a href="#about" className={styles.navLink}>About</a>
+                    <a href="#features" className={styles.navLink}>Features</a>
+                    <a href="#crops" className={styles.navLink}>Crops</a>
+                    <a href="#contact" className={styles.navLink}>Contact</a>
 
-                    <a
-                        href="#home"
-                        className={styles.navLink}
-                    >
-                        Home
-                    </a>
-
-                    <a
-                        href="#about"
-                        className={styles.navLink}
-                    >
-                        About
-                    </a>
-
-                    <a
-                        href="#features"
-                        className={styles.navLink}
-                    >
-                        Features
-                    </a>
-
-                    <a
-                        href="#crops"
-                        className={styles.navLink}
-                    >
-                        Crops
-                    </a>
-
-                    <a
-                        href="#contact"
-                        className={styles.navLink}
-                    >
-                        Contact
-                    </a>
-
-                    {/* Sign In */}
-                    <Link
-                        to="/signin"
-                        className={styles.signinButton}
-                    >
-                        Sign In
-                    </Link>
-
-                    {/* Sign Up */}
-                    <Link
-                        to="/signup"
-                        className={styles.signupButton}
-                    >
-                        Join Us
-                    </Link>
-
+                    <Link to="/signin" className={styles.signinButton}>Sign In</Link>
+                    <Link to="/signup" className={styles.signupButton}>Join Us</Link>
                 </div>
-
             </nav>
 
-
-            {/* ================= HERO ================= */}
-
-            <section
-                className={styles.hero}
-                id="home"
-            >
+            <section className={styles.hero} id="home" onMouseMove={handleMouseMove} style={heroStyle}>
+                <div className={styles.heroBackground} aria-hidden="true">
+                    <div className={styles.skyLayer} />
+                    <div className={styles.gridLayer} />
+                    <div className={styles.fieldLayer} />
+                    <div className={styles.glow} />
+                </div>
+                <div className={styles.heroOverlay} />
 
                 <div className={styles.heroContent}>
-
-                    <p className={styles.badge}>
-                        🌾 SMART AGRICULTURE PLATFORM
-                    </p>
+                    <p className={styles.badge}>AGRI NEXT / SMART AGRICULTURE</p>
 
                     <h1>
-                        Connecting Farmers
-                        <br />
-                        <span>With Fresh Food.</span>
+                        <span className={styles.lineOne}>FARMING</span>
+                        <span className={styles.lineTwo}>REIMAGINED.</span>
                     </h1>
 
                     <p className={styles.heroText}>
-                        AgriNext connects farmers directly with
-                        customers, making it easier to discover,
-                        sell and buy fresh agricultural products.
+                        Connecting farmers directly with customers through a smarter agricultural marketplace.
                     </p>
 
                     <div className={styles.heroButtons}>
+                        <a href="#crops" className={styles.primaryButton}>
+                            EXPLORE CROPS <span aria-hidden="true">→</span>
+                        </a>
 
-                        {/* Create Account */}
-                        <Link
-                            to="/signup"
-                            className={styles.primaryButton}
-                        >
-                            Create Account →
+                        <Link to="/signup" className={styles.secondaryButton}>
+                            JOIN AGRINEXT
                         </Link>
-
-                        {/* Sign In */}
-                        <Link
-                            to="/signin"
-                            className={styles.secondaryButton}
-                        >
-                            Sign In
-                        </Link>
-
                     </div>
-
                 </div>
 
+                <div className={styles.heroPanel} aria-hidden="true">
+                    <div className={styles.panelBadge}>LIVE HARVEST</div>
+                    <h3>Fresh from farm</h3>
+                    <p>Quality crops directly from local farmers, cultivated with care.</p>
 
-                {/* Hero Card */}
-
-                <div className={styles.heroImage}>
-
-                    <div className={styles.imageCard}>
-
-                        <div className={styles.farmIcon}>
-                            🌾
+                    <div className={styles.stats}>
+                        <div>
+                            <strong>100+</strong>
+                            <small>Farmers</small>
                         </div>
-
-                        <h3>
-                            Fresh From Farm
-                        </h3>
-
-                        <p>
-                            Quality crops directly from
-                            local farmers.
-                        </p>
-
-                        <div className={styles.stats}>
-
-                            <div>
-                                <strong>100+</strong>
-                                <small>Farmers</small>
-                            </div>
-
-                            <div>
-                                <strong>50+</strong>
-                                <small>Crops</small>
-                            </div>
-
-                            <div>
-                                <strong>24/7</strong>
-                                <small>Platform</small>
-                            </div>
-
+                        <div>
+                            <strong>50+</strong>
+                            <small>Crops</small>
                         </div>
-
+                        <div>
+                            <strong>24/7</strong>
+                            <small>Platform</small>
+                        </div>
                     </div>
-
-
-                    <div className={styles.floatingCard}>
-                        🥕 Fresh Crops
-                    </div>
-
                 </div>
 
+                <div className={styles.scrollCue} aria-label="Scroll to continue">
+                    <span>SCROLL</span>
+                </div>
             </section>
 
-
-            {/* ================= ABOUT ================= */}
-
-            <section
-                className={styles.about}
-                id="about"
-            >
-
+            <section className={styles.about} id="about">
                 <div className={styles.sectionTitle}>
-
-                    <span>
-                        WHO WE ARE
-                    </span>
-
+                    <span>WHO WE ARE</span>
                     <h2>
                         Growing a Better
                         <br />
                         <strong>Agricultural Future.</strong>
                     </h2>
-
                     <p>
-                        AgriNext is a modern agricultural platform
-                        designed to bring farmers and customers
+                        AgriNext is a modern agricultural platform designed to bring farmers and customers
                         together through technology.
                     </p>
-
                 </div>
-
 
                 <div className={styles.aboutCards}>
-
-                    {/* Farmer */}
-
                     <div className={styles.aboutCard}>
-
-                        <div className={styles.cardIcon}>
-                            👨‍🌾
-                        </div>
-
-                        <h3>
-                            For Farmers
-                        </h3>
-
+                        <div className={styles.cardIcon}>👨‍🌾</div>
+                        <h3>For Farmers</h3>
                         <p>
-                            Farmers can create accounts, manage
-                            their farms and add available crops
-                            for customers.
+                            Farmers can create accounts, manage their farms and add available crops for
+                            customers.
                         </p>
-
                     </div>
 
-
-                    {/* Customer */}
-
                     <div className={styles.aboutCard}>
-
-                        <div className={styles.cardIcon}>
-                            🛒
-                        </div>
-
-                        <h3>
-                            For Customers
-                        </h3>
-
+                        <div className={styles.cardIcon}>🛒</div>
+                        <h3>For Customers</h3>
                         <p>
-                            Customers can discover fresh crops
-                            and connect with farmers to get
-                            quality agricultural products.
+                            Customers can discover fresh crops and connect with farmers to get quality
+                            agricultural products.
                         </p>
-
                     </div>
 
-
-                    {/* Direct Connection */}
-
                     <div className={styles.aboutCard}>
-
-                        <div className={styles.cardIcon}>
-                            🤝
-                        </div>
-
-                        <h3>
-                            Direct Connection
-                        </h3>
-
+                        <div className={styles.cardIcon}>🤝</div>
+                        <h3>Direct Connection</h3>
                         <p>
-                            AgriNext creates a direct connection
-                            between farmers and customers while
-                            reducing unnecessary middlemen.
+                            AgriNext creates a direct connection between farmers and customers while reducing
+                            unnecessary middlemen.
                         </p>
-
                     </div>
-
                 </div>
-
             </section>
 
-
-            {/* ================= FEATURES ================= */}
-
-            <section
-                className={styles.features}
-                id="features"
-            >
-
+            <section className={styles.features} id="features">
                 <div className={styles.sectionTitle}>
-
-                    <span>
-                        OUR FEATURES
-                    </span>
-
-                    <h2>
-                        Everything You Need
-                    </h2>
-
-                    <p>
-                        Simple tools designed to make
-                        agriculture smarter and easier.
-                    </p>
-
+                    <span>OUR FEATURES</span>
+                    <h2>Everything You Need</h2>
+                    <p>Simple tools designed to make agriculture smarter and easier.</p>
                 </div>
-
 
                 <div className={styles.featureGrid}>
-
                     <div className={styles.featureCard}>
-
                         <span>👨‍🌾</span>
-
-                        <h3>
-                            Farmer Registration
-                        </h3>
-
-                        <p>
-                            Farmers can register and create
-                            their agricultural profile.
-                        </p>
-
+                        <h3>Farmer Registration</h3>
+                        <p>Farmers can register and create their agricultural profile.</p>
                     </div>
 
-
                     <div className={styles.featureCard}>
-
                         <span>🌱</span>
-
-                        <h3>
-                            Crop Management
-                        </h3>
-
-                        <p>
-                            Farmers can add, update and manage
-                            their available crops.
-                        </p>
-
+                        <h3>Crop Management</h3>
+                        <p>Farmers can add, update and manage their available crops.</p>
                     </div>
 
-
                     <div className={styles.featureCard}>
-
                         <span>🔍</span>
-
-                        <h3>
-                            Find Fresh Crops
-                        </h3>
-
-                        <p>
-                            Customers can explore different
-                            crops available from farmers.
-                        </p>
-
+                        <h3>Find Fresh Crops</h3>
+                        <p>Customers can explore different crops available from farmers.</p>
                     </div>
-
 
                     <div className={styles.featureCard}>
-
                         <span>🔐</span>
-
-                        <h3>
-                            Secure Accounts
-                        </h3>
-
-                        <p>
-                            Separate farmer and customer
-                            accounts provide a secure experience.
-                        </p>
-
+                        <h3>Secure Accounts</h3>
+                        <p>Separate farmer and customer accounts provide a secure experience.</p>
                     </div>
-
                 </div>
-
             </section>
 
-
-            {/* ================= CROPS ================= */}
-
-            <section
-                className={styles.about}
-                id="crops"
-            >
-
+            <section className={styles.about} id="crops">
                 <div className={styles.sectionTitle}>
-
-                    <span>
-                        FRESH FROM FARM
-                    </span>
-
-                    <h2>
-                        Explore Our Crops
-                    </h2>
-
-                    <p>
-                        Discover fresh agricultural products
-                        from local farmers.
-                    </p>
-
+                    <span>FRESH FROM FARM</span>
+                    <h2>Explore Our Crops</h2>
+                    <p>Discover fresh agricultural products from local farmers.</p>
                 </div>
-
 
                 <div className={styles.aboutCards}>
-
                     <div className={styles.aboutCard}>
-
-                        <div className={styles.cardIcon}>
-                            🍅
-                        </div>
-
-                        <h3>
-                            Vegetables
-                        </h3>
-
-                        <p>
-                            Fresh vegetables directly from
-                            local farms.
-                        </p>
-
+                        <div className={styles.cardIcon}>🍅</div>
+                        <h3>Vegetables</h3>
+                        <p>Fresh vegetables directly from local farms.</p>
                     </div>
 
-
                     <div className={styles.aboutCard}>
-
-                        <div className={styles.cardIcon}>
-                            🍎
-                        </div>
-
-                        <h3>
-                            Fruits
-                        </h3>
-
-                        <p>
-                            Fresh and naturally grown fruits
-                            from trusted farmers.
-                        </p>
-
+                        <div className={styles.cardIcon}>🍎</div>
+                        <h3>Fruits</h3>
+                        <p>Fresh and naturally grown fruits from trusted farmers.</p>
                     </div>
 
-
                     <div className={styles.aboutCard}>
-
-                        <div className={styles.cardIcon}>
-                            🌾
-                        </div>
-
-                        <h3>
-                            Grains
-                        </h3>
-
-                        <p>
-                            Quality grains supplied directly
-                            by farmers.
-                        </p>
-
+                        <div className={styles.cardIcon}>🌾</div>
+                        <h3>Grains</h3>
+                        <p>Quality grains supplied directly by farmers.</p>
                     </div>
-
                 </div>
-
             </section>
-
-
-            {/* ================= CTA ================= */}
 
             <section className={styles.cta}>
+                <h2>Ready to Join AgriNext?</h2>
+                <p>Create your account and become part of the smarter agricultural community.</p>
 
-                <h2>
-                    Ready to Join AgriNext?
-                </h2>
-
-                <p>
-                    Create your account and become part of
-                    the smarter agricultural community.
-                </p>
-
-                <Link
-                    to="/signup"
-                    className={styles.ctaButton}
-                >
-                    Create Your Account →
-                </Link>
-
-                <Link
-                    to="/signin"
-                    className={styles.secondaryButton}
-                >
-                    Sign In
-                </Link>
-
+                <Link to="/signup" className={styles.ctaButton}>Create Your Account →</Link>
+                <Link to="/signin" className={styles.secondaryButton}>Sign In</Link>
             </section>
 
-
-            {/* ================= FOOTER ================= */}
-
-            <footer
-                className={styles.footer}
-                id="contact"
-            >
-
-                <div className={styles.footerLogo}>
-                    🌱 AgriNext
-                </div>
-
-                <p>
-                    Connecting farmers and customers for a
-                    better agricultural future.
-                </p>
-
+            <footer className={styles.footer} id="contact">
+                <div className={styles.footerLogo}>🌱 AgriNext</div>
+                <p>Connecting farmers and customers for a better agricultural future.</p>
 
                 <div className={styles.footerLinks}>
-
-                    <a href="#home">
-                        Home
-                    </a>
-
-                    <a href="#about">
-                        About
-                    </a>
-
-                    <a href="#features">
-                        Features
-                    </a>
-
-                    <a href="#crops">
-                        Crops
-                    </a>
-
-                    <Link to="/signin">
-                        Sign In
-                    </Link>
-
-                    <Link to="/signup">
-                        Sign Up
-                    </Link>
-
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#features">Features</a>
+                    <a href="#crops">Crops</a>
+                    <Link to="/signin">Sign In</Link>
+                    <Link to="/signup">Sign Up</Link>
                 </div>
 
-
-                <p className={styles.copyright}>
-                    © 2026 AgriNext. All rights reserved.
-                </p>
-
+                <p className={styles.copyright}>© 2026 AgriNext. All rights reserved.</p>
             </footer>
-
         </div>
     );
 };

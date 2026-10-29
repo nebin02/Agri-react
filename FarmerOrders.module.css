@@ -293,3 +293,77 @@
         grid-template-columns: 1fr;
     }
 }
+
+.page {
+    background:
+        radial-gradient(ellipse at 12% 5%, rgba(117,208,67,.11), transparent 30rem),
+        #08120c;
+    color: #f4faf1;
+}
+.navbar {
+    position: sticky;
+    top: 12px;
+    z-index: 20;
+    width: min(1320px, calc(100% - 40px));
+    height: auto;
+    min-height: 68px;
+    margin: 12px auto 0;
+    padding: 12px 20px;
+    border: 1px solid rgba(235,255,230,.13);
+    border-radius: 18px;
+    background: rgba(12,24,16,.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+.logo { color: #f2faed; }
+.navButton {
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 10px;
+    background: rgba(255,255,255,.045);
+    color: #e8f4e2;
+}
+.logoutButton { border-radius: 10px; background: rgba(255,255,255,.055); color: #f2d5cb; box-shadow: none; }
+.container { width: min(1220px, calc(100% - 48px)); padding-top: 30px; }
+.header,
+.orderCard {
+    border: 1px solid rgba(235,255,230,.13);
+    border-radius: 21px;
+    background: rgba(255,255,255,.06);
+    box-shadow: 0 20px 54px rgba(0,0,0,.2);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+.header h1,
+.orderHeader h2,
+.customerBox h3,
+.address h3 { color: #f2f8ee; }
+.header p,
+.orderHeader small,
+.customerBox p,
+.details span,
+.date,
+.address p { color: rgba(230,240,226,.67); }
+.smallTitle { color: #c7ff5e; }
+.backButton {
+    border: 1px solid rgba(199,255,94,.23);
+    border-radius: 10px;
+    background: rgba(199,255,94,.1);
+    color: #d9f7b8;
+    box-shadow: none;
+}
+.customerBox,
+.address {
+    border: 1px solid rgba(235,255,230,.1);
+    border-radius: 14px;
+    background: rgba(255,255,255,.045);
+}
+.customerBox { border-left: 3px solid #a9e95a; }
+.customerBox strong,
+.details strong { color: #f1f8ed; }
+.details div { border-color: rgba(255,255,255,.1); }
+.status { border: 1px solid rgba(199,255,94,.16); background: rgba(199,255,94,.09); color: #d6f5af; }
+
+@media (max-width: 640px) {
+    .navbar { top: 8px; width: calc(100% - 24px); margin-top: 8px; padding: 10px 12px; }
+    .container { width: calc(100% - 28px); padding-top: 22px; }
+}

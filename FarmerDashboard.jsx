@@ -1,691 +1,739 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./FarmerDashboard.module.css";
+import formatCurrency from "./formatCurrency";
 
 const FarmerDashboard = () => {
 
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
-const [crops, setCrops] = useState([]);
-const [orders, setOrders] = useState([]);
+    const [crops, setCrops] = useState([]);
+    const [orders, setOrders] = useState([]);
 
-const [loading, setLoading] = useState(true);
-const [ordersLoading, setOrdersLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [ordersLoading, setOrdersLoading] = useState(true);
 
-const farmerId = localStorage.getItem("userId");
+    const farmerId = localStorage.getItem("userId");
 
 
-// ================= GET FARMER CROPS =================
+    // ================= GET FARMER CROPS =================
 
-const getMyCrops = async () => {
+    const getMyCrops = async () => {
 
-try {
+        try {
 
-const response = await axios.get(
-`http://localhost:3000/crops/farmer/${farmerId}`
-);
+            const response = await axios.get(
+                `http://localhost:3000/crops/farmer/${farmerId}`
+            );
 
-console.log("Farmer crops:", response.data);
+            console.log("Farmer crops:", response.data);
 
-setCrops(response.data.crops || []);
+            /*
+             * Your backend may return either:
+             * { crops: [...] }
+             * or directly [...]
+             */
 
-} catch (error) {
+            if (Array.isArray(response.data)) {
+                setCrops(response.data);
+            } else {
+                setCrops(response.data.crops || []);
+            }
 
-console.log("Error getting farmer crops:", error);
+        } catch (error) {
 
-} finally {
+            console.log("Error getting farmer crops:", error);
 
-setLoading(false);
+        } finally {
 
-}
-};
+            setLoading(false);
 
+        }
+    };
 
-// ================= GET FARMER ORDERS =================
 
-const getFarmerOrders = async () => {
+    // ================= GET FARMER ORDERS =================
 
-try {
+    const getFarmerOrders = async () => {
 
-const response = await axios.get(
-`http://localhost:3000/orders/farmer/${farmerId}`
-);
+        try {
 
-console.log("Farmer orders:", response.data);
+            const response = await axios.get(
+                `http://localhost:3000/orders/farmer/${farmerId}`
+            );
 
-setOrders(response.data.orders || []);
+            console.log("Farmer orders:", response.data);
 
-} catch (error) {
+            setOrders(response.data.orders || []);
 
-console.log("Error getting farmer orders:", error);
+        } catch (error) {
 
-} finally {
+            console.log("Error getting farmer orders:", error);
 
-setOrdersLoading(false);
+        } finally {
 
-}
-};
+            setOrdersLoading(false);
 
+        }
+    };
 
-// ================= LOAD DATA =================
 
-useEffect(() => {
+    // ================= LOAD DATA =================
 
-if (farmerId) {
+    useEffect(() => {
 
-getMyCrops();
-getFarmerOrders();
+        if (farmerId) {
 
-} else {
+            getMyCrops();
+            getFarmerOrders();
 
-setLoading(false);
-setOrdersLoading(false);
+        } else {
 
-}
+            setLoading(false);
+            setOrdersLoading(false);
 
-}, [farmerId]);
+        }
 
+    }, [farmerId]);
 
-// ================= TOTAL CROPS =================
 
-const totalCrops = crops.length;
+    // ================= TOTAL CROPS =================
 
+    const totalCrops = crops.length;
 
-// ================= TOTAL QUANTITY =================
 
-const totalQuantity = crops.reduce(
-(total, crop) => total + Number(crop.quantity || 0),
-0
-);
+    // ================= TOTAL QUANTITY =================
 
+    const totalQuantity = crops.reduce(
+        (total, crop) => total + Number(crop.quantity || 0),
+        0
+    );
 
-// ================= TOTAL SALES =================
 
-const totalSales = orders.reduce(
-(total, order) => {
+    // ================= TOTAL SALES =================
 
-if (order.orderStatus === "Cancelled") {
-return total;
-}
+    const totalSales = orders.reduce(
+        (total, order) => {
 
-return total + Number(order.totalAmount || 0);
+            if (order.orderStatus === "Cancelled") {
+                return total;
+            }
 
-},
-0
-);
+            return total + Number(order.totalAmount || 0);
 
+        },
+        0
+    );
 
-// ================= UNIQUE CUSTOMERS =================
 
-const customerIds = orders
-.filter((order) => order.customerId)
-.map((order) => {
+    // ================= UNIQUE CUSTOMERS =================
 
-if (typeof order.customerId === "object") {
-return order.customerId._id;
-}
+    const customerIds = orders
+        .filter((order) => order.customerId)
+        .map((order) => {
 
-return order.customerId;
+            if (typeof order.customerId === "object") {
+                return order.customerId._id;
+            }
 
-});
+            return order.customerId;
 
-const uniqueCustomers = [
-...new Set(customerIds)
-];
+        });
 
-const totalCustomers = uniqueCustomers.length;
+    const uniqueCustomers = [
+        ...new Set(customerIds)
+    ];
 
+    const totalCustomers = uniqueCustomers.length;
 
-// ================= LOGOUT =================
 
-const handleLogout = () => {
+    // ================= LOGOUT =================
 
-localStorage.removeItem("userId");
-localStorage.removeItem("userType");
+    const handleLogout = () => {
 
-navigate("/signin");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userType");
 
-};
+        navigate("/signin");
 
+    };
 
-return (
 
-<div className={styles.page}>
+    return (
 
-{/* ================= NAVBAR ================= */}
+        <div className={styles.page}>
 
-<nav className={styles.navbar}>
+            {/* ================= NAVBAR ================= */}
 
-<div className={styles.logo}>
-🌱 AgriNext
-</div>
+            <nav className={styles.navbar}>
 
-<div className={styles.navLinks}>
+                <div className={styles.logo}>
+                    🌱 AgriNext
+                </div>
 
-<button
-className={styles.navButton}
->
-Dashboard
-</button>
+                <div className={styles.navLinks}>
 
-<button
-className={styles.navButton}
-onClick={() => navigate("/add-crop")}
->
-Add Crop
-</button>
+                    <button
+                        className={styles.navButton}
+                    >
+                        Dashboard
+                    </button>
 
-<button
-className={styles.logoutButton}
-onClick={handleLogout}
->
-Logout
-</button>
+                    <button
+                        className={styles.navButton}
+                        onClick={() => navigate("/add-crop")}
+                    >
+                        Add Crop
+                    </button>
 
-</div>
+                    <button
+                        className={styles.logoutButton}
+                        onClick={handleLogout}
+                    >
+                        Logout
+                    </button>
 
-</nav>
+                </div>
 
+            </nav>
 
-{/* ================= MAIN ================= */}
 
-<main className={styles.container}>
+            {/* ================= MAIN ================= */}
 
-{/* ================= WELCOME ================= */}
+            <main className={styles.container}>
 
-<section className={styles.welcome}>
+                {/* ================= WELCOME ================= */}
 
-<div>
+                <section className={styles.welcome}>
 
-<p className={styles.smallTitle}>
-FARMER DASHBOARD
-</p>
+                    <div>
 
-<h1>
-Welcome back, Farmer 🌾
-</h1>
+                        <p className={styles.smallTitle}>
+                            FARMER DASHBOARD
+                        </p>
 
-<p className={styles.welcomeText}>
-Manage your crops, check your listings
-and connect with customers.
-</p>
+                        <h1>
+                            Welcome back, Farmer 🌾
+                        </h1>
 
-</div>
+                        <p className={styles.welcomeText}>
+                            Manage your crops, check your listings
+                            and connect with customers.
+                        </p>
 
-<div className={styles.welcomeIcon}>
-🌱
-</div>
+                    </div>
 
-</section>
+                    <div className={styles.welcomeIcon}>
+                        🌱
+                    </div>
 
+                </section>
 
-{/* ================= STATISTICS ================= */}
 
-<section className={styles.statsGrid}>
+                {/* ================= STATISTICS ================= */}
 
+                <section className={styles.statsGrid}>
 
-{/* TOTAL CROPS */}
+                    {/* TOTAL CROPS */}
 
-<div className={styles.statCard}>
+                    <div className={styles.statCard}>
 
-<div className={styles.statIcon}>
-🌾
-</div>
+                        <div className={styles.statIcon}>
+                            🌾
+                        </div>
 
-<div>
+                        <div>
 
-<p>Total Crops</p>
+                            <p>Total Crops</p>
 
-<h2>
-{loading ? "..." : totalCrops}
-</h2>
+                            <h2>
+                                {loading ? "..." : totalCrops}
+                            </h2>
 
-</div>
+                        </div>
 
-</div>
+                    </div>
 
 
-{/* TOTAL QUANTITY */}
+                    {/* TOTAL QUANTITY */}
 
-<div className={styles.statCard}>
+                    <div className={styles.statCard}>
 
-<div className={styles.statIcon}>
-📦
-</div>
+                        <div className={styles.statIcon}>
+                            📦
+                        </div>
 
-<div>
+                        <div>
 
-<p>Total Quantity</p>
+                            <p>Total Quantity</p>
 
-<h2>
-{loading
-? "..."
-: `${totalQuantity} KG`
-}
-</h2>
+                            <h2>
+                                {loading
+                                    ? "..."
+                                    : `${totalQuantity} KG`
+                                }
+                            </h2>
 
-</div>
+                        </div>
 
-</div>
+                    </div>
 
 
-{/* TOTAL SALES */}
+                    {/* TOTAL SALES */}
 
-<div className={styles.statCard}>
+                    <div className={styles.statCard}>
 
-<div className={styles.statIcon}>
-💰
-</div>
+                        <div className={styles.statIcon}>
+                            💰
+                        </div>
 
-<div>
+                        <div>
 
-<p>Total Sales</p>
+                            <p>Total Sales</p>
 
-<h2>
-{ordersLoading
-? "..."
-: `₹${totalSales}`
-}
-</h2>
+                            <h2>
+                                {ordersLoading
+                                    ? "..."
+                                    : formatCurrency(totalSales)
+                                }
+                            </h2>
 
-</div>
+                        </div>
 
-</div>
+                    </div>
 
 
-{/* CUSTOMERS */}
+                    {/* CUSTOMERS */}
 
-<div className={styles.statCard}>
+                    <div className={styles.statCard}>
 
-<div className={styles.statIcon}>
-👥
-</div>
+                        <div className={styles.statIcon}>
+                            👥
+                        </div>
 
-<div>
+                        <div>
 
-<p>Customers</p>
+                            <p>Customers</p>
 
-<h2>
-{ordersLoading
-? "..."
-: totalCustomers
-}
-</h2>
+                            <h2>
+                                {ordersLoading
+                                    ? "..."
+                                    : totalCustomers
+                                }
+                            </h2>
 
-</div>
+                        </div>
 
-</div>
+                    </div>
 
-</section>
+                </section>
 
 
-{/* ================= QUICK ACTIONS ================= */}
+                {/* ================= QUICK ACTIONS ================= */}
 
-<section className={styles.section}>
+                <section className={styles.section}>
 
-<div className={styles.sectionHeader}>
+                    <div className={styles.sectionHeader}>
 
-<div>
+                        <div>
 
-<p className={styles.sectionTitle}>
-QUICK ACTIONS
-</p>
+                            <p className={styles.sectionTitle}>
+                                QUICK ACTIONS
+                            </p>
 
-<h2>
-Manage Your Farm
-</h2>
+                            <h2>
+                                Manage Your Farm
+                            </h2>
 
-</div>
+                        </div>
 
-</div>
+                    </div>
 
 
-<div className={styles.actionGrid}>
+                    <div className={styles.actionGrid}>
 
+                        {/* ADD CROP */}
 
-{/* ADD CROP */}
+                        <button
+                            className={styles.actionCard}
+                            onClick={() => navigate("/add-crop")}
+                        >
 
-<button
-className={styles.actionCard}
-onClick={() => navigate("/add-crop")}
->
+                            <div className={styles.actionIcon}>
+                                ➕
+                            </div>
 
-<div className={styles.actionIcon}>
-➕
-</div>
+                            <div>
 
-<div>
+                                <h3>
+                                    Add New Crop
+                                </h3>
 
-<h3>
-Add New Crop
-</h3>
+                                <p>
+                                    Add a crop to your farm listing.
+                                </p>
 
-<p>
-Add a crop to your farm listing.
-</p>
+                            </div>
 
-</div>
+                            <span className={styles.arrow}>
+                                →
+                            </span>
 
-<span className={styles.arrow}>
-→
-</span>
+                        </button>
 
-</button>
 
+                        {/* MY CROPS */}
 
-{/* MY CROPS */}
+                        <button
+                            className={styles.actionCard}
+                            onClick={() => navigate("/my-crops")}
+                        >
 
-<button
-className={styles.actionCard}
-onClick={() => navigate("/my-crops")}
->
+                            <div className={styles.actionIcon}>
+                                🌱
+                            </div>
 
-<div className={styles.actionIcon}>
-🌱
-</div>
+                            <div>
 
-<div>
+                                <h3>
+                                    My Crops
+                                </h3>
 
-<h3>
-My Crops
-</h3>
+                                <p>
+                                    View and manage your crop listings.
+                                </p>
 
-<p>
-View and manage your crop listings.
-</p>
+                            </div>
 
-</div>
+                            <span className={styles.arrow}>
+                                →
+                            </span>
 
-<span className={styles.arrow}>
-→
-</span>
+                        </button>
 
-</button>
 
+                        {/* ORDERS */}
 
-{/* ORDERS */}
+                        <button
+                            className={styles.actionCard}
+                            onClick={() => navigate("/farmer-orders")}
+                        >
 
-<button
-className={styles.actionCard}
-onClick={() => navigate("/farmer-orders")}
->
+                            <div className={styles.actionIcon}>
+                                📋
+                            </div>
 
-<div className={styles.actionIcon}>
-📋
-</div>
+                            <div>
 
-<div>
+                                <h3>
+                                    Orders
+                                </h3>
 
-<h3>
-Orders
-</h3>
+                                <p>
+                                    Check customer crop orders.
+                                </p>
 
-<p>
-Check customer crop orders.
-</p>
+                            </div>
 
-</div>
+                            <span className={styles.arrow}>
+                                →
+                            </span>
 
-<span className={styles.arrow}>
-→
-</span>
+                        </button>
 
-</button>
+                    </div>
 
+                </section>
 
-</div>
 
-</section>
+                {/* ================= CUSTOMER ORDERS ================= */}
 
+                <section className={styles.cropSection}>
 
-{/* ================= CUSTOMER ORDERS ================= */}
+                    <div className={styles.cropHeader}>
 
-<section className={styles.cropSection}>
+                        <div>
 
-<div className={styles.cropHeader}>
+                            <p className={styles.sectionTitle}>
+                                CUSTOMER ORDERS
+                            </p>
 
-<div>
+                            <h2>
+                                Recent Orders
+                            </h2>
 
-<p className={styles.sectionTitle}>
-CUSTOMER ORDERS
-</p>
+                        </div>
 
-<h2>
-Recent Orders
-</h2>
+                        <button
+                            className={styles.viewButton}
+                            onClick={() => navigate("/farmer-orders")}
+                        >
+                            View All →
+                        </button>
 
-</div>
+                    </div>
 
-<button
-className={styles.viewButton}
-onClick={() => navigate("/farmer-orders")}
->
-View All →
-</button>
 
-</div>
+                    {ordersLoading ? (
 
+                        <div className={styles.emptyState}>
 
-{ordersLoading ? (
+                            <div className={styles.emptyIcon}>
+                                📦
+                            </div>
 
-<div className={styles.emptyState}>
+                            <h3>
+                                Loading orders...
+                            </h3>
 
-<div className={styles.emptyIcon}>
-📦
-</div>
+                        </div>
 
-<h3>
-Loading orders...
-</h3>
+                    ) : orders.length === 0 ? (
 
-</div>
+                        <div className={styles.emptyState}>
 
-) : orders.length === 0 ? (
+                            <div className={styles.emptyIcon}>
+                                📦
+                            </div>
 
-<div className={styles.emptyState}>
+                            <h3>
+                                No customer orders yet
+                            </h3>
 
-<div className={styles.emptyIcon}>
-📦
-</div>
+                            <p>
+                                Orders placed by customers will
+                                appear here.
+                            </p>
 
-<h3>
-No customer orders yet
-</h3>
+                        </div>
 
-<p>
-Orders placed by customers will
-appear here.
-</p>
+                    ) : (
 
-</div>
+                        <div className={styles.actionGrid}>
 
-) : (
+                            {orders.slice(0, 3).map((order) => (
 
-<div className={styles.actionGrid}>
+                                <div
+                                    className={styles.actionCard}
+                                    key={order._id}
+                                >
 
-{orders.slice(0, 3).map((order) => (
+                                    <div className={styles.actionIcon}>
+                                        📦
+                                    </div>
 
-<div
-className={styles.actionCard}
-key={order._id}
->
+                                    <div>
 
-<div className={styles.actionIcon}>
-📦
-</div>
+                                        <h3>
+                                            {order.cropName}
+                                        </h3>
 
-<div>
+                                        <p>
+                                            Customer:{" "}
+                                            {order.customerId?.name ||
+                                                "Customer"}
+                                        </p>
 
-<h3>
-{order.cropName}
-</h3>
+                                        <p>
+                                            Phone:{" "}
+                                            {order.customerId?.phone ||
+                                                "Not available"}
+                                        </p>
 
-<p>
-Customer:{" "}
-{order.customerId?.name ||
-"Customer"}
-</p>
+                                        <p>
+                                            Quantity:{" "}
+                                            {order.quantity}{" "}
+                                            {order.unit}
+                                        </p>
 
-<p>
-Phone:{" "}
-{order.customerId?.phone ||
-"Not available"}
-</p>
+                                        <p>
+                                            Total:{" "}
+                                            {formatCurrency(order.totalAmount)}
+                                        </p>
 
-<p>
-Quantity:{" "}
-{order.quantity}{" "}
-{order.unit}
-</p>
+                                        <p>
+                                            Status:{" "}
+                                            {order.orderStatus}
+                                        </p>
 
-<p>
-Total: ₹
-{order.totalAmount}
-</p>
+                                    </div>
 
-<p>
-Status:{" "}
-{order.orderStatus}
-</p>
+                                </div>
 
-</div>
+                            ))}
 
-</div>
+                        </div>
 
-))}
+                    )}
 
-</div>
+                </section>
 
-)}
 
-</section>
+                {/* ================= RECENT CROPS ================= */}
 
+                <section className={styles.cropSection}>
 
-{/* ================= RECENT CROPS ================= */}
+                    <div className={styles.cropHeader}>
 
-<section className={styles.cropSection}>
+                        <div>
 
-<div className={styles.cropHeader}>
+                            <p className={styles.sectionTitle}>
+                                CROP LISTINGS
+                            </p>
 
-<div>
+                            <h2>
+                                My Recent Crops
+                            </h2>
 
-<p className={styles.sectionTitle}>
-CROP LISTINGS
-</p>
+                        </div>
 
-<h2>
-My Recent Crops
-</h2>
+                        <button
+                            className={styles.viewButton}
+                            onClick={() => navigate("/my-crops")}
+                        >
+                            View All →
+                        </button>
 
-</div>
+                    </div>
 
-<button
-className={styles.viewButton}
-onClick={() => navigate("/my-crops")}
->
-View All →
-</button>
 
-</div>
+                    {/* SHOW CROPS */}
 
+                    {loading ? (
 
-{/* SHOW CROPS */}
+                        <div className={styles.emptyState}>
 
-{crops.length === 0 ? (
+                            <div className={styles.emptyIcon}>
+                                🌾
+                            </div>
 
-<div className={styles.emptyState}>
+                            <h3>
+                                Loading crops...
+                            </h3>
 
-<div className={styles.emptyIcon}>
-🌾
-</div>
+                        </div>
 
-<h3>
-No crops added yet
-</h3>
+                    ) : crops.length === 0 ? (
 
-<p>
-Start adding your crops to make them
-available to customers.
-</p>
+                        <div className={styles.emptyState}>
 
-<button
-className={styles.addButton}
-onClick={() => navigate("/add-crop")}
->
-+ Add Your First Crop
-</button>
+                            <div className={styles.emptyIcon}>
+                                🌾
+                            </div>
 
-</div>
+                            <h3>
+                                No crops added yet
+                            </h3>
 
-) : (
+                            <p>
+                                Start adding your crops to make them
+                                available to customers.
+                            </p>
 
-<div className={styles.actionGrid}>
+                            <button
+                                className={styles.addButton}
+                                onClick={() => navigate("/add-crop")}
+                            >
+                                + Add Your First Crop
+                            </button>
 
-{crops.slice(0, 3).map((crop) => (
+                        </div>
 
-<div
-className={styles.actionCard}
-key={crop._id}
->
+                    ) : (
 
-<div className={styles.actionIcon}>
-🌾
-</div>
+                        <div className={styles.actionGrid}>
 
-<div>
+                            {crops.slice(0, 3).map((crop) => (
 
-<h3>
-{crop.cropName}
-</h3>
+                                <div
+                                    className={styles.actionCard}
+                                    key={crop._id}
+                                >
 
-<p>
-Quantity:{" "}
-{crop.quantity}{" "}
-{crop.unit}
-</p>
+                                    {/* ================= CROP IMAGE ================= */}
 
-<p>
-Price: ₹{crop.price}
-</p>
+                                    <div className={styles.cropImageContainer}>
 
-</div>
+                                        {crop.imageUrl ? (
 
-</div>
+                                            <img
+                                                src={crop.imageUrl}
+                                                alt={crop.cropName}
+                                                className={styles.cropImage}
+                                            />
 
-))}
+                                        ) : (
 
-</div>
+                                            <div className={styles.cropImagePlaceholder}>
+                                                🌾
+                                            </div>
 
-)}
+                                        )}
 
-</section>
+                                    </div>
 
-</main>
 
+                                    {/* ================= CROP DETAILS ================= */}
 
-{/* ================= FOOTER ================= */}
+                                    <div className={styles.cropDetails}>
 
-<footer className={styles.footer}>
+                                        <h3>
+                                            {crop.cropName}
+                                        </h3>
 
-<div className={styles.footerLogo}>
-🌱 AgriNext
-</div>
+                                        <p>
+                                            Quantity:{" "}
+                                            {crop.quantity}{" "}
+                                            {crop.unit}
+                                        </p>
 
-<p>
-Connecting farmers with fresh food.
-</p>
+                                        <p>
+                                            Price: {formatCurrency(crop.price)}
+                                        </p>
 
-<p className={styles.copyright}>
-© 2026 AgriNext. All rights reserved.
-</p>
+                                        <p>
+                                            Location:{" "}
+                                            {crop.location ||
+                                                "Not available"}
+                                        </p>
 
-</footer>
+                                    </div>
 
-</div>
+                                </div>
 
-);
+                            ))}
+
+                        </div>
+
+                    )}
+
+                </section>
+
+            </main>
+
+
+            {/* ================= FOOTER ================= */}
+
+            <footer className={styles.footer}>
+
+                <div className={styles.footerLogo}>
+                    🌱 AgriNext
+                </div>
+
+                <p>
+                    Connecting farmers with fresh food.
+                </p>
+
+                <p className={styles.copyright}>
+                    © 2026 AgriNext. All rights reserved.
+                </p>
+
+            </footer>
+
+        </div>
+
+    );
 
 };
 

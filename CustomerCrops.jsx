@@ -2,361 +2,396 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./CustomerCrops.module.css";
+import FirstOrderOffer from "./FirstOrderOffer";
+import formatCurrency from "./formatCurrency";
 
 const CustomerCrops = () => {
 
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
-const [crops, setCrops] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState("");
+    const [crops, setCrops] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-// ==========================================
-// GET CROPS FROM BACKEND
-// ==========================================
+    // ==========================================
+    // GET CROPS FROM BACKEND
+    // ==========================================
 
-const getCrops = async () => {
+    const getCrops = async () => {
 
-try {
+        try {
 
-const response = await axios.get(
-"http://localhost:3000/crops"
-);
+            const response = await axios.get(
+                "http://localhost:3000/crops"
+            );
 
-setCrops(response.data.crops || []);
-setLoading(false);
+            console.log("CROPS FROM BACKEND:", response.data.crops);
 
-} catch (error) {
+            setCrops(response.data.crops || []);
+            setLoading(false);
 
-console.log(error);
+        } catch (error) {
 
-setError("Unable to load crops.");
-setLoading(false);
-}
-};
+            console.log(error);
 
+            setError("Unable to load crops.");
+            setLoading(false);
+        }
+    };
 
-useEffect(() => {
-getCrops();
-}, []);
 
+    useEffect(() => {
+        getCrops();
+    }, []);
 
-// ==========================================
-// ADD CROP TO CART
-// ==========================================
 
-const addToCart = (crop) => {
+    // ==========================================
+    // ADD CROP TO CART
+    // ==========================================
 
-const existingCart = JSON.parse(
-localStorage.getItem("cart") || "[]"
-);
+    const addToCart = (crop) => {
 
-const alreadyAdded = existingCart.some(
-(item) => item._id === crop._id
-);
+        const existingCart = JSON.parse(
+            localStorage.getItem("cart") || "[]"
+        );
 
-if (alreadyAdded) {
+        const alreadyAdded = existingCart.some(
+            (item) => item._id === crop._id
+        );
 
-alert("This crop is already in your cart! 🛒");
-return;
-}
+        if (alreadyAdded) {
 
-const updatedCart = [
-...existingCart,
-crop
-];
+            alert("This crop is already in your cart! 🛒");
+            return;
+        }
 
-localStorage.setItem(
-"cart",
-JSON.stringify(updatedCart)
-);
+        const updatedCart = [
+            ...existingCart,
+            crop
+        ];
 
-alert(`${crop.cropName} added to cart 🛒`);
-};
+        localStorage.setItem(
+            "cart",
+            JSON.stringify(updatedCart)
+        );
 
+        alert(`${crop.cropName} added to cart 🛒`);
+    };
 
-// ==========================================
-// BUY NOW
-// ==========================================
 
-const buyNow = (crop) => {
+    // ==========================================
+    // BUY NOW
+    // ==========================================
 
-localStorage.setItem(
-"buyNowCrop",
-JSON.stringify(crop)
-);
+    const buyNow = (crop) => {
 
-navigate("/checkout");
-};
+        localStorage.setItem(
+            "buyNowCrop",
+            JSON.stringify(crop)
+        );
 
+        navigate("/checkout");
+    };
 
-// ==========================================
-// VIEW CART
-// ==========================================
 
-const viewCart = () => {
+    // ==========================================
+    // VIEW CART
+    // ==========================================
 
-navigate("/cart");
+    const viewCart = () => {
 
-};
+        navigate("/cart");
 
+    };
 
-// ==========================================
-// VIEW MY ORDERS
-// ==========================================
 
-const viewOrders = () => {
+    // ==========================================
+    // VIEW MY ORDERS
+    // ==========================================
 
-navigate("/orders");
+    const viewOrders = () => {
 
-};
+        navigate("/orders");
 
+    };
 
-// ==========================================
-// LOADING
-// ==========================================
 
-if (loading) {
+    // ==========================================
+    // LOADING
+    // ==========================================
 
-return (
-<div className={styles.loading}>
+    if (loading) {
 
-<h2>
-Loading crops... 🌱
-</h2>
+        return (
+            <div className={styles.loading}>
 
-</div>
-);
-}
+                <h2>
+                    Loading crops... 🌱
+                </h2>
 
+            </div>
+        );
+    }
 
-// ==========================================
-// ERROR
-// ==========================================
 
-if (error) {
+    // ==========================================
+    // ERROR
+    // ==========================================
 
-return (
-<div className={styles.error}>
+    if (error) {
 
-<h2>
-{error}
-</h2>
+        return (
+            <div className={styles.error}>
 
-<button onClick={getCrops}>
-Try Again
-</button>
+                <h2>
+                    {error}
+                </h2>
 
-</div>
-);
-}
+                <button onClick={getCrops}>
+                    Try Again
+                </button>
 
+            </div>
+        );
+    }
 
-// ==========================================
-// PAGE
-// ==========================================
 
-return (
+    // ==========================================
+    // PAGE
+    // ==========================================
 
-<div className={styles.container}>
+    return (
 
-{/* ==================================
-HEADER
-================================== */}
+        <div className={styles.container}>
 
-<div className={styles.header}>
+            {/* ==================================
+            HEADER
+            ================================== */}
 
-<div>
+            <div className={styles.header}>
 
-<h1>
-Available Crops 🌾
-</h1>
+                <div>
 
-<p>
-Buy fresh crops directly from farmers.
-</p>
+                    <h1>
+                        Available Crops 🌾
+                    </h1>
 
-</div>
+                    <p>
+                        Buy fresh crops directly from farmers.
+                    </p>
 
+                </div>
 
-{/* HEADER BUTTONS */}
 
-<div className={styles.headerButtons}>
+                {/* HEADER BUTTONS */}
 
-{/* MY ORDERS */}
+                <div className={styles.headerButtons}>
 
-<button
-className={styles.ordersButton}
-onClick={viewOrders}
->
-📦 My Orders
-</button>
+                    {/* MY ORDERS */}
 
+                    <button
+                        className={styles.ordersButton}
+                        onClick={viewOrders}
+                    >
+                        📦 My Orders
+                    </button>
 
-{/* VIEW CART */}
 
-<button
-className={styles.viewCartButton}
-onClick={viewCart}
->
-🛒 View Cart
-</button>
+                    {/* VIEW CART */}
 
-</div>
+                    <button
+                        className={styles.viewCartButton}
+                        onClick={viewCart}
+                    >
+                        🛒 View Cart
+                    </button>
 
-</div>
+                </div>
 
+            </div>
 
-{/* ==================================
-NO CROPS
-================================== */}
+            <FirstOrderOffer />
 
-{crops.length === 0 ? (
+            {/* ==================================
+            NO CROPS
+            ================================== */}
 
-<div className={styles.noCrops}>
+            {crops.length === 0 ? (
 
-<h2>
-No crops available 🌱
-</h2>
+                <div className={styles.noCrops}>
 
-<p>
-Farmers have not added any crops yet.
-</p>
+                    <h2>
+                        No crops available 🌱
+                    </h2>
 
-</div>
+                    <p>
+                        Farmers have not added any crops yet.
+                    </p>
 
-) : (
+                </div>
 
-/* ==================================
-CROP GRID
-================================== */
+            ) : (
 
-<div className={styles.cropGrid}>
+                /* ==================================
+                CROP GRID
+                ================================== */
 
-{crops.map((crop) => (
+                <div className={styles.cropGrid}>
 
-<div
-className={styles.cropCard}
-key={crop._id}
->
+                    {crops.map((crop) => (
 
-{/* CROP ICON */}
+                        <div
+                            className={styles.cropCard}
+                            key={crop._id}
+                        >
 
-<div className={styles.cropIcon}>
-🌾
-</div>
+                            {/* ==================================
+                            CROP IMAGE
+                            ================================== */}
 
+                            <div className={styles.cropImageContainer}>
 
-{/* CROP NAME */}
+                                {crop.imageUrl ? (
 
-<h2>
-{crop.cropName}
-</h2>
+                                    <img
+                                        src={crop.imageUrl}
+                                        alt={crop.cropName}
+                                        className={styles.cropImage}
+                                        onError={(e) => {
+                                            e.target.style.display = "none";
+                                            e.target.nextElementSibling.style.display = "flex";
+                                        }}
+                                    />
 
+                                ) : null}
 
-{/* CROP DETAILS */}
 
-<div className={styles.details}>
+                                {/* FALLBACK ICON */}
 
-<p>
-<strong>
-Quantity:
-</strong>{" "}
+                                <div
+                                    className={styles.cropIcon}
+                                    style={{
+                                        display: crop.imageUrl
+                                            ? "none"
+                                            : "flex"
+                                    }}
+                                >
+                                    🌾
+                                </div>
 
-{crop.quantity} {crop.unit}
-</p>
+                            </div>
 
 
-<p>
-<strong>
-Price:
-</strong>{" "}
+                            {/* CROP NAME */}
 
-₹{crop.price} / {crop.unit}
-</p>
+                            <h2>
+                                {crop.cropName}
+                            </h2>
 
 
-<p>
-<strong>
-Location:
-</strong>{" "}
+                            {/* CROP DETAILS */}
 
-{crop.location}
-</p>
+                            <div className={styles.details}>
 
-</div>
+                                <p>
+                                    <strong>
+                                        Quantity:
+                                    </strong>{" "}
 
+                                    {crop.quantity} {crop.unit}
+                                </p>
 
-{/* FARMER INFORMATION */}
 
-<div className={styles.farmerBox}>
+                                <p>
+                                    <strong>
+                                        Price:
+                                    </strong>{" "}
 
-<h3>
-👨‍🌾 Farmer Details
-</h3>
+                                    {formatCurrency(crop.price)} / {crop.unit}
+                                </p>
 
 
-<p>
-<strong>
-Name:
-</strong>{" "}
+                                <p>
+                                    <strong>
+                                        Location:
+                                    </strong>{" "}
 
-{crop.farmerId?.name ||
-"Farmer"}
-</p>
+                                    {crop.location}
+                                </p>
 
+                            </div>
 
-<p>
-<strong>
-Phone:
-</strong>{" "}
 
-{crop.farmerId?.phone ||
-"Not available"}
-</p>
+                            {/* FARMER INFORMATION */}
 
-</div>
+                            <div className={styles.farmerBox}>
 
+                                <h3>
+                                    👨‍🌾 Farmer Details
+                                </h3>
 
-{/* BUTTONS */}
 
-<div className={styles.buttonGroup}>
+                                <p>
+                                    <strong>
+                                        Name:
+                                    </strong>{" "}
 
-{/* ADD TO CART */}
+                                    {crop.farmerId?.name ||
+                                        "Farmer"}
+                                </p>
 
-<button
-className={styles.cartButton}
-onClick={() =>
-addToCart(crop)
-}
->
-🛒 Add to Cart
-</button>
 
+                                <p>
+                                    <strong>
+                                        Phone:
+                                    </strong>{" "}
 
-{/* BUY NOW */}
+                                    {crop.farmerId?.phone ||
+                                        "Not available"}
+                                </p>
 
-<button
-className={styles.buyButton}
-onClick={() =>
-buyNow(crop)
-}
->
-⚡ Buy Now
-</button>
+                            </div>
 
-</div>
 
-</div>
+                            {/* BUTTONS */}
 
-))}
+                            <div className={styles.buttonGroup}>
 
-</div>
+                                {/* ADD TO CART */}
 
-)}
+                                <button
+                                    className={styles.cartButton}
+                                    onClick={() =>
+                                        addToCart(crop)
+                                    }
+                                >
+                                    🛒 Add to Cart
+                                </button>
 
-</div>
-);
+
+                                {/* BUY NOW */}
+
+                                <button
+                                    className={styles.buyButton}
+                                    onClick={() =>
+                                        buyNow(crop)
+                                    }
+                                >
+                                    ⚡ Buy Now
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+            )}
+
+        </div>
+    );
 };
 
 
